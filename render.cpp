@@ -1,4 +1,6 @@
 #pragma once
+#include<chrono>
+#include<thread>
 #include<math.h>
 #include <algorithm>
 #include<vector>
@@ -11,8 +13,8 @@ const int HEIGHT = 38;
 
 const float SCALE = 0.5;
 
-const float CAM_Z = -2;
-const float CAM_F = 1;
+const float CAM_Z = -5;
+const float CAM_F = 0.5;
 
 
 class vec2{
@@ -65,6 +67,33 @@ class vec3{
         return {x / magnitude, y / magnitude, z / magnitude};
     }
 
+    void rotateOriginXY(float angle){
+      float cosx = cos(angle);
+      float sinx = sin(angle);
+
+      float newX = x * cosx - y * sinx;
+      y = x * sinx + y * cosx;
+      x = newX;
+    }
+
+    void rotateOriginXZ(float angle){
+      float cosx = cos(angle);
+      float sinx = sin(angle);
+
+      float newX = x * cosx - z * sinx;
+      z = x * sinx + z * cosx;
+      x = newX;
+    }
+
+    void rotateOriginYZ(float angle){
+      float cosx = cos(angle);
+      float sinx = sin(angle);
+
+      float newY = y * cosx - z * sinx;
+      y = y * sinx + z * cosx;
+      x = newY;
+    }
+
 };
 
 vec3 project(vec3 v){
@@ -80,17 +109,23 @@ class polygon{
   vec3 point_2;
   vec3 point_3;
 
+  void rotateOriginXZ(float angle){
+    point_1.rotateOriginXZ(angle);
+    point_2.rotateOriginXZ(angle);
+    point_3.rotateOriginXZ(angle);
+  }
+
   void render(vector<char> &screen, vector<float> zbuffer){
     vec3 p1 = project(point_1);
     vec3 p2 = project(point_2);
     vec3 p3 = project(point_3);
-    
+    /*
     cout << p1.x << ' ' << p1.y << ' ' << p1.z << '\n';
     cout << p2.x << ' ' << p2.y << ' ' << p2.z << '\n';
     cout << p3.x << ' ' << p3.y << ' ' << p3.z << '\n';
 
     cout << "render\n";
-    
+    */
     /*
      *  D  =  (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3)
      *
@@ -102,9 +137,9 @@ class polygon{
 
     float D = 1 / ((p2.y - p3.y) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.y - p3.y));
 
-    for(int i = int(min({p1.y, p2.y, p3.y})); i < int(max({p1.y, p2.y, p3.y})); i++){
-        for(int j = int(min({p1.x, p2.x, p3.x})); j < int(max({p1.x, p2.x, p3.x})); j++){
-          cout << i << ' ' << j << ' ' << i * WIDTH + j << '\n';
+    for(int i = int(min({p1.y, p2.y, p3.y}) - 1); i < int(max({p1.y, p2.y, p3.y}) + 1); i++){
+        for(int j = int(min({p1.x, p2.x, p3.x}) - 1); j < int(max({p1.x, p2.x, p3.x}) + 1); j++){
+          // cout << i << ' ' << j << ' ' << i * WIDTH + j << '\n';
           float L1 = ((p2.y - p3.y) * (j - p3.x) + (p3.x - p2.x) * (i - p3.y)) * D;
           float L2 = ((p3.y - p1.y) * (j - p3.x) + (p1.x - p3.x) * (i - p3.y)) * D;
           if((L1 + L2 <= 1) && L1 > 0  && L2 > 0){
