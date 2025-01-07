@@ -34,13 +34,21 @@ class vec3{
   float y;
   float z;
 
-  vec3() : x(0), y(0), z(0) {};
+  vec3(){
+    x = 0;
+    y = 0;
+    z = 0;
+  };
 
   vec3(float a, float b, float c){
     x = a;
     y = b;
     z = c;
   }
+
+  vec3 operator+(const vec3& other) const {
+        return {x + other.x, y + other.y, z + other.z};
+    }
 
   vec3 operator-(const vec3& other) const {
         return {x - other.x, y - other.y, z - other.z};
@@ -108,11 +116,27 @@ class polygon{
   vec3 point_1;
   vec3 point_2;
   vec3 point_3;
+  
+  polygon(){
+    ;
+  }
 
+  polygon(vec3 p1, vec3 p2, vec3 p3){
+    point_1 = p1;
+    point_2 = p2;
+    point_3 = p3;
+  }
+  
   void rotateOriginXZ(float angle){
     point_1.rotateOriginXZ(angle);
     point_2.rotateOriginXZ(angle);
     point_3.rotateOriginXZ(angle);
+  }
+  
+  void rotateOriginYZ(float angle){
+    point_1.rotateOriginYZ(angle);
+    point_2.rotateOriginYZ(angle);
+    point_3.rotateOriginYZ(angle);
   }
 
   void render(vector<char> &screen, vector<float> zbuffer){
@@ -151,14 +175,96 @@ class polygon{
             float cosTheta = vec3::dot(normal, SunLight);
 
             int index = (float)(cosTheta * 13);
-
-            screen[i * WIDTH + j] = ".,-~:;=!*#$@"[index];
+            index = max({0, index});
+            screen[i * WIDTH + j] = ".,-~:;=!*#$@@@@@@@@@@@@@@@@@@@"[index];
           }
         }
     }
   }
+
+  polygon operator+(const vec3& other){
+    return{point_1 + other, point_2 + other, point_3 + other};
+  }
+};
+
+class square{
+  public:
+  polygon first;
+
+  polygon second;
+
+  square(){
+    ;
+  } 
+
+  square(polygon f, polygon s){
+    first = f;
+    second = s;
+  }
+
+  square(float half_size){
+    vec3 p1(half_size, half_size, 0);
+    vec3 p2(half_size, -half_size, 0);
+    vec3 p3(-half_size, half_size, 0);
+    vec3 p4(-half_size, -half_size, 0);
+    first = polygon(p1, p2, p3);
+    second = polygon(p2, p3, p4);
+  }
+
+  square operator+(const vec3& other){
+    return {first + other, second + other};
+  }
+
+  void render(vector<char> &screen, vector<float> zbuffer){
+    first.render(screen, zbuffer);
+    second.render(screen, zbuffer);
+  }
+
+  void rotateOriginXZ(float angle){
+    first.rotateOriginXZ(angle);
+    second.rotateOriginXZ(angle);
+  }
+
+  void rotateOriginYZ(float angle){
+    first.rotateOriginYZ(angle);
+    second.rotateOriginYZ(angle);
+  }
+
 };
 
 
+class cube{
+  vector<square> squares;
+  public:
+  cube(float half_size){
+    squares.resize(6);
+    fill(squares.begin(), squares.end(), (square(half_size) + vec3(0, 0, half_size)));
+    squares[1].rotateOriginXZ(M_PI * 0.5);
+    squares[2].rotateOriginXZ(M_PI);
+    squares[3].rotateOriginXZ(M_PI * 1.5);
+    squares[4].rotateOriginYZ(M_PI * 0.5);
+    squares[5].rotateOriginYZ(M_PI / 2);
+  }
+ 
+  void rotateOriginXZ(float angle){
+    for(int i = 0; i < 6; i++){
+      squares[i].rotateOriginXZ(angle);
+    }
+  }
+  
+  void operator+=(const vec3& other){
+    for(int i = 0; i < 6; i++){
+      squares[i] = squares[i] + other;
+    }
+    return;
+  }
+ 
 
+  void render(vector<char> &screen, vector<float> zbuffer){
+    for(int i = 0; i < 6; i++){
+      squares[i].render(screen, zbuffer);
+    }
+  }
+
+};
 
