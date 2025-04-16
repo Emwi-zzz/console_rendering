@@ -11,7 +11,7 @@ I use **clang++** for compiling the project.
 To compile the code, run the following command in your terminal:
 
 ```bash
-clang++ -std=c++17 main.cpp
+src/clang++ -std=c++17 main.cpp
 ```
 ## How It Works
 
