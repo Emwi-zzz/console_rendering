@@ -13,12 +13,3 @@ To compile the code, run the following command in your terminal:
 ```bash
 src/clang++ -std=c++17 main.cpp
 ```
-## How It Works
-
-The project utilizes raycasting to render polygons on the screen with light direction and perspective applied to a screen of dimensions `WIDTH x HEIGHT`. Due to the non-square nature of console symbols, the final raycast is scaled accordingly.
-
-Each more complex figure is composed of polygons or other shapes, all of which are located in the `src/render/` directory.
-
-To adapt the project for your own resolution and font, you will need to adjust the `WIDTH` and `HEIGHT` values. These values represent the number of symbols displayed in your command line. Additionally, you may need to modify the scaling factor (the proportion between the height and width of a symbol).
-
-You can also change the direction of the sunlight and create objects from the given figures or even define your own.
