@@ -1,6 +1,6 @@
 # Console Rendering API
 
-**Note:** This is a school project aimed at gaining an understanding of how raycasting works. The code is not optimized due to the low resolution and the minimal number of objects present in the scene.
+**Note:** This is a school project aimed at gaining an understanding of how rendering works. The code is not optimized due to the low resolution and the minimal number of objects present in the scene.
 
 For instance, figures are represented as objects, and each point is defined for each polygon, even if two polygons share the same point. Please note that this code will not be optimized or updated.
 
